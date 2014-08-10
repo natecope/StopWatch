@@ -73,7 +73,7 @@
                                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="7de-Yo-eo7">
+                                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7de-Yo-eo7">
                                         <rect key="frame" x="20" y="55" width="280" height="2"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </progressView>
@@ -85,7 +85,9 @@
                     </view>
                     <connections>
                         <outlet property="lapButton" destination="tTv-KD-P8E" id="n43-ha-hVU"/>
+                        <outlet property="lapTimerText" destination="DGO-H9-BBE" id="njc-mO-OgG"/>
                         <outlet property="masterView" destination="kh9-bI-dsS" id="Pe6-ku-TuA"/>
+                        <outlet property="secondsProgressBar" destination="7de-Yo-eo7" id="lNa-PM-B1U"/>
                         <outlet property="startButton" destination="LFk-rU-gyF" id="Y0n-gt-G1T"/>
                         <outlet property="timerText" destination="zyL-tT-opN" id="tdl-aM-Pl4"/>
                         <outlet property="uiBaseView" destination="Ihz-BD-aCl" id="ZEa-iQ-gaa"/>

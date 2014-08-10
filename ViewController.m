@@ -22,8 +22,10 @@
 @property (strong, nonatomic) IBOutlet UIView *masterView;
 @property (strong, nonatomic) IBOutlet UIView *uiBaseView;
 @property (weak, nonatomic) IBOutlet UILabel *timerText;
+@property (weak, nonatomic) IBOutlet UILabel *lapTimerText;
 @property (weak, nonatomic) IBOutlet UIButton *startButton;
 @property (weak, nonatomic) IBOutlet UIButton *lapButton;
+@property (weak, nonatomic) IBOutlet UIProgressView *secondsProgressBar;
 
 - (IBAction)lapButtonPressed:(id)sender;
 - (IBAction)resetButtonPressed:(id)sender;
@@ -134,6 +136,10 @@
     [self.lapButton setEnabled:NO];
     
     self.timerText.text = @"00:00:00.000";
+    
+    self.lapTimerText.text = @"00:00:00.000";
+    
+    [self.secondsProgressBar setProgress:0];
 }
 
 - (void)updateDisplayTime {
@@ -161,6 +167,13 @@
     
     //get elapsed seconds since timer start
     NSTimeInterval elapsedSeconds = [_currentDate timeIntervalSinceDate:_startDate];
+    
+    //grab milliseconds
+    double intPart;
+    double milliseconds = modf(elapsedSeconds, &intPart);
+    
+    //update progress bar
+    [self updateSecondsProgressBar:(double)milliseconds];
     
     //update display
     _timerText.text = [self formatTimeInterval:elapsedSeconds];
@@ -190,8 +203,26 @@
     return [formattedDate stringFromDate:dateFromElapsedSeconds];
 }
 
+- (void)updateLapTimer{
+    
+    //get current date
+    _currentDate = [NSDate date];
+    
+    //get elapsed seconds since timer start
+    NSTimeInterval elapsedSeconds = [_currentDate timeIntervalSinceDate:_startDate];
+    
+    //update display
+    _lapTimerText.text = [self formatTimeInterval:elapsedSeconds];
+    
+}
+
+-(void)updateSecondsProgressBar:(float)milliseconds{
+    [_secondsProgressBar setProgress:milliseconds animated:YES];
+}
+
 
 - (IBAction)lapButtonPressed:(id)sender {
+    [self updateLapTimer];
 }
 
 - (IBAction)resetButtonPressed:(id)sender {
