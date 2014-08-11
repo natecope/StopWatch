@@ -8,16 +8,12 @@
 
 #import "ViewController.h"
 
-@interface ViewController (){
+@interface ViewController () <StopWatchDelegate>{
 
-    NSDate *_startDate;
-    NSDate *_endDate;
-    NSDate *_currentDate;
-    NSTimer *_myTimer;
-    
-    //NSCalendar *gregorianCalendarl
+    StopWatch *_stopWatch;
+    //NSDate *_currentDate;
 
-    }
+}
 
 @property (strong, nonatomic) IBOutlet UIView *masterView;
 @property (strong, nonatomic) IBOutlet UIView *uiBaseView;
@@ -40,9 +36,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-    
-    //_myTimer  = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateTime:) userInfo:nil repeats:YES];
+
+    _stopWatch = [[StopWatch alloc]init];
+    _stopWatch.delegate = self;
 }
 
 - (void)didReceiveMemoryWarning
@@ -51,13 +47,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void) updateTime:(NSTimer *)timer{
-    
-    _currentDate = [NSDate date];
-
-    [self updateDisplayTime];
-    
-}
 
 - (void)viewDidAppear:(BOOL)animated{
     self.uiBaseView.center = self.masterView.center;
@@ -65,154 +54,53 @@
 
 
 - (void) stopTimer{
+
+    [self.lapButton setEnabled:NO];
+
+    [_stopWatch stopTimer];
     
-    [_myTimer invalidate];
-    
-    _myTimer = nil;
-    
-    if(_startDate){
-        //store an end date
-        _endDate = [NSDate date];
-        
-        //NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
-        
-        //[formatter setDateFormat: @"MMMM, YYYY - HH:mm:ss.SSS"];
-        
-        //NSString *endDateString = [formatter stringFromDate:_endDate];
-        
-        //NSLog(@"End date: %@", endDateString);
-        [self updateDisplayTime];
-        
-        [self.lapButton setEnabled:NO];
-    }
 }
 
 - (void) startTimer{
     
-    //only if nil
-    if(!_myTimer){
-        
-        _myTimer  = [NSTimer scheduledTimerWithTimeInterval:.001 target:self selector:@selector(updateTime:) userInfo:nil repeats:YES];
-        
-        [self.startButton setTitle:@"Stop" forState:UIControlStateNormal];
-        
-        [self.lapButton setEnabled:YES];
-        
-        //store a start date
-        if(!_startDate){
-          _startDate = [NSDate date];
-        } else {
-            // resume
-            NSTimeInterval duration = [_endDate timeIntervalSinceDate:_startDate];
-            _startDate = [NSDate dateWithTimeInterval:-duration sinceDate:[NSDate date]];
-        }
-        
-        NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
-        
-        [formatter setDateFormat: @"MMMM, YYYY - HH:mm:ss.SSS"];
-        
-        NSString *startDateString = [formatter stringFromDate:_startDate];
-        
-        NSLog(@"Start date: %@", startDateString);
-        
-    } else {
-        
-        [self stopTimer];
-        
-        [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
-    }
+    [self.startButton setTitle:@"Stop" forState:UIControlStateNormal];
+    
+    [self.lapButton setEnabled:YES];
+    
+    [_stopWatch startTimer];
+
 }
 
 
 - (void) resetTimer{
     
-    _startDate = nil;
-    _endDate = nil;
-    
-    [self stopTimer];
-    
     [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
-    
     [self.lapButton setEnabled:NO];
-    
     self.timerText.text = @"00:00:00.000";
-    
     self.lapTimerText.text = @"00:00:00.000";
-    
     [self.secondsProgressBar setProgress:0];
-}
-
-- (void)updateDisplayTime {
-    /*_currentDate = [NSDate date];
     
-    NSTimeInterval elapsedSeconds = [_currentDate timeIntervalSinceDate:_startDate];
-    
-    NSLog(@"elapsedSeconds: %f", elapsedSeconds);
-    
-    NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    
-    NSUInteger unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
-    
-    NSDateComponents *elapsedDateComponents = [gregorianCalendar components:unitFlags fromDate:_startDate toDate:_currentDate options:0];
-    
-    //GRAB MILLISECONDS
-    double intPart;
-    double milliseconds = modf(elapsedSeconds, &intPart);
-    
-    _timerText.text = [NSString stringWithFormat:@"%02d:%02d:%06.3f", elapsedDateComponents.hour, elapsedDateComponents.minute, elapsedDateComponents.second + milliseconds];
-    */
-    
-    //get current date
-    _currentDate = [NSDate date];
-    
-    //get elapsed seconds since timer start
-    NSTimeInterval elapsedSeconds = [_currentDate timeIntervalSinceDate:_startDate];
-    
-    //grab milliseconds
-    double intPart;
-    double milliseconds = modf(elapsedSeconds, &intPart);
-    
-    //update progress bar
-    [self updateSecondsProgressBar:(double)milliseconds];
-    
-    //update display
-    _timerText.text = [self formatTimeInterval:elapsedSeconds];
+    [_stopWatch resetTimer];
     
 }
 
-- (NSString *)formatTimeInterval:(NSTimeInterval)timeInterval{
+
+- (void) updateDisplayTime{
     
-    //get date from elapsed seconds using interval from start of computer time (January 1, 1970)
-    NSDate *dateFromElapsedSeconds = [NSDate dateWithTimeIntervalSince1970:timeInterval];
-    
-    //init timezone
-    NSTimeZone *timeZone = [[NSTimeZone alloc]init];
-    
-    //set timezone to universal
-    timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
-    
-    //init nsdateformatter
-    NSDateFormatter *formattedDate = [[NSDateFormatter alloc]init];
-    
-    //format date
-    [formattedDate setDateFormat:@"HH:mm:ss.SSS"];
-    
-    //set time zone
-    [formattedDate setTimeZone:timeZone];
-    
-    return [formattedDate stringFromDate:dateFromElapsedSeconds];
 }
+
+
 
 - (void)updateLapTimer{
     
     //get current date
-    _currentDate = [NSDate date];
+    //_currentDate = [NSDate date];
     
     //get elapsed seconds since timer start
-    NSTimeInterval elapsedSeconds = [_currentDate timeIntervalSinceDate:_startDate];
+    NSTimeInterval elapsedSeconds = [[NSDate date] timeIntervalSinceDate:_stopWatch.startDate];
     
     //update display
-    _lapTimerText.text = [self formatTimeInterval:elapsedSeconds];
+    _lapTimerText.text = [_stopWatch formatTimeInterval:elapsedSeconds];
     
 }
 
@@ -231,7 +119,19 @@
 
 
 - (IBAction)startButtonPressed:(id)sender {
-    [self startTimer];
+    if(_stopWatch.startDate){
+        [self stopTimer];
+    } else {
+        [self startTimer];
+    }
+}
+
+#pragma mark - StopWatchDelegate
+- (void) timeUpdated:(StopWatch *)stopWatch{
+    
+    NSTimeInterval duration = [stopWatch duration];
+    
+    _timerText.text = [stopWatch formatTimeInterval:duration];
 }
 
 @end

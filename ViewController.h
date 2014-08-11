@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "StopWatch.h"
 
 @interface ViewController : UIViewController
 
