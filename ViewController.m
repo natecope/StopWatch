@@ -11,6 +11,7 @@
 @interface ViewController () <StopWatchDelegate>{
 
     StopWatch *_stopWatch;
+    BOOL startToggle;
     //NSDate *_currentDate;
 
 }
@@ -39,6 +40,8 @@
 
     _stopWatch = [[StopWatch alloc]init];
     _stopWatch.delegate = self;
+    
+    startToggle = false;
 }
 
 - (void)didReceiveMemoryWarning
@@ -54,6 +57,8 @@
 
 
 - (void) stopTimer{
+
+    [self.startButton setTitle:@"Start" forState:UIControlStateNormal];
 
     [self.lapButton setEnabled:NO];
 
@@ -104,8 +109,15 @@
     
 }
 
--(void)updateSecondsProgressBar:(float)milliseconds{
-    [_secondsProgressBar setProgress:milliseconds animated:YES];
+-(void)updateSecondsProgressBar{
+    
+    NSTimeInterval elapsedSeconds = [[NSDate date] timeIntervalSinceDate:_stopWatch.startDate];
+    
+    //grab milliseconds
+    double intPart;
+    double milliseconds = modf(elapsedSeconds, &intPart);
+    
+    [_secondsProgressBar setProgress:(double)milliseconds animated:YES];
 }
 
 
@@ -119,11 +131,15 @@
 
 
 - (IBAction)startButtonPressed:(id)sender {
-    if(_stopWatch.startDate){
-        [self stopTimer];
-    } else {
+    
+    if(!startToggle){
+        startToggle = true;
         [self startTimer];
+    } else {
+        startToggle = false;
+        [self stopTimer];
     }
+
 }
 
 #pragma mark - StopWatchDelegate
@@ -132,6 +148,8 @@
     NSTimeInterval duration = [stopWatch duration];
     
     _timerText.text = [stopWatch formatTimeInterval:duration];
+    
+    [self updateSecondsProgressBar];
 }
 
 @end

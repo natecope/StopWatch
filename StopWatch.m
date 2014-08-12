@@ -27,13 +27,7 @@
         //store an end date
         _endDate = [NSDate date];
         
-        //NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
-        
-        //[formatter setDateFormat: @"MMMM, YYYY - HH:mm:ss.SSS"];
-        
-        //NSString *endDateString = [formatter stringFromDate:_endDate];
-        
-        //NSLog(@"End date: %@", endDateString);
+        NSLog(@"End date: %@", _endDate);
         [self updateStopWatch];
         
         //[self.lapButton setEnabled:NO];
@@ -48,6 +42,7 @@
 
 - (NSTimeInterval)duration {
     NSTimeInterval elapsedSeconds = 0;
+    
     if(_currentDate && _startDate){
         elapsedSeconds = [_currentDate timeIntervalSinceDate:_startDate];
     }
@@ -80,7 +75,7 @@
         
     } else {
         
-        [self stopTimer];
+        //[self stopTimer];
         
         //[self.startButton setTitle:@"Start" forState:UIControlStateNormal];
     }
@@ -94,7 +89,6 @@
     _startDate = nil;
     _endDate = nil;
     _currentDate = nil;
-
     
     [self updateStopWatch];
 
